@@ -1,6 +1,7 @@
 from flask import Flask , jsonify
 from flask_restx import Resource, Api
 from newsscrapper import scraper
+import os
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,4 +17,5 @@ class home(Resource):
         return {'hello':'world'}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    PORT = int(os.environ.get("PORT", 3000))
+    app.run(host="0.0.0.0", port=PORT, debug=False)
