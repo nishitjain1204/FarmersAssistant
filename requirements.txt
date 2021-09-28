@@ -150,6 +150,8 @@
 # wrapt==1.12.1
 # xkit==0.0.0
 # youtube-dl==2021.4.26
+torch==1.7.0
+
 
 scikit-learn
 Pillow
