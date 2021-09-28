@@ -150,3 +150,6 @@
 # wrapt==1.12.1
 # xkit==0.0.0
 # youtube-dl==2021.4.26
+
+scikit-learn
+Pillow
