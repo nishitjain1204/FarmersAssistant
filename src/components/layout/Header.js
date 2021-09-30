@@ -117,6 +117,11 @@ const Header = ({
                       </Link>
                     </li>
                     <li>
+                      <Link to="/crop" onClick={closeMenu}>
+                        Crop
+                      </Link>
+                    </li>
+                    <li>
                       <Link to="/news" onClick={closeMenu}>
                         News
                       </Link>

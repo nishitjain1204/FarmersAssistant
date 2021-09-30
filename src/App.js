@@ -1,4 +1,4 @@
-import React, { useRef, useEffect,useState} from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   useLocation,
   BrowserRouter as Router,
@@ -17,6 +17,7 @@ import LayoutDefault from "./layouts/LayoutDefault";
 // Views
 import Home from "./views/Home";
 import Footer from "./components/layout/Footer";
+import Crop from "./components/pages/Crop";
 
 // Initialize Google Analytics
 ReactGA.initialize(process.env.REACT_APP_GA_CODE);
@@ -27,19 +28,16 @@ const trackPage = (page) => {
 };
 
 const App = () => {
-
-  const [news,setNews] = useState([]);
+  const [news, setNews] = useState([]);
   const childRef = useRef();
   let location = useLocation();
 
   const fetchNews = async () => {
-
     const res = await axios.get(
-      'https://farmers-assistant-backend.herokuapp.com/news'
+      "https://farmers-assistant-backend.herokuapp.com/news"
     );
     setNews(res.data);
-
-}
+  };
 
   useEffect(() => {
     const page = location.pathname;
@@ -57,9 +55,10 @@ const App = () => {
         children={() => (
           <Switch>
             <AppRoute exact path="/" component={Home} layout={LayoutDefault} />
-            <Route exact path="/news" >
-              <News  news = {news} />
+            <Route exact path="/news">
+              <News news={news} />
             </Route>
+            <Route exact path="/crop" component={Crop} />
           </Switch>
         )}
       />
