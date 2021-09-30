@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect,useState} from "react";
 import {
   useLocation,
   BrowserRouter as Router,
@@ -27,14 +27,26 @@ const trackPage = (page) => {
 };
 
 const App = () => {
+
+  const [news,setNews] = useState([]);
   const childRef = useRef();
   let location = useLocation();
+
+  const fetchNews = async () => {
+
+    const res = await axios.get(
+      'https://farmers-assistant-backend.herokuapp.com/news'
+    );
+    setNews(res.data);
+
+}
 
   useEffect(() => {
     const page = location.pathname;
     document.body.classList.add("is-loaded");
     childRef.current.init();
     trackPage(page);
+    fetchNews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
@@ -45,7 +57,9 @@ const App = () => {
         children={() => (
           <Switch>
             <AppRoute exact path="/" component={Home} layout={LayoutDefault} />
-            <Route exact path="/news" component={News} />
+            <Route exact path="/news" >
+              <News  news = {news} />
+            </Route>
           </Switch>
         )}
       />
