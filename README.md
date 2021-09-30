@@ -1,2 +1,0 @@
-# FarmersAssistant
-first commit
