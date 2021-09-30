@@ -1,5 +1,5 @@
 farmers-assistant-backend/.
 torch-1.4.0+cpu-cp38-cp38-linux_x86_64.whl
 torchvision-0.8.1+cpu-cp38-cp38-linux_x86_64.whl
-__pycache__/.
-utils/__pycache__/.
+__pycache__/*
+utils/__pycache__/*

@@ -6,6 +6,35 @@ from werkzeug.utils import secure_filename
 from disease_predictions import predict_image
 from utils.disease import disease_dic
 import os
+import pickle
+import requests
+import numpy as np
+
+crop_recommendation_model_path = 'models/RandomForest.pkl'
+crop_recommendation_model = pickle.load(open(crop_recommendation_model_path, 'rb'))
+
+def weather_fetch(city_name):
+    """
+    Fetch and returns the temperature and humidity of a city
+    :params: city_name
+    :return: temperature, humidity
+    """
+    api_key = '86d30f802c60961313cc1f87ece01ae8'
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+
+    complete_url = base_url + "appid=" + api_key + "&q=" + city_name
+    response = requests.get(complete_url)
+    x = response.json()
+
+    print(x)
+    if x["cod"] != "404":
+        y = x["main"]
+
+        temperature = round((y["temp"] - 273.15), 2)
+        humidity = y["humidity"]
+        return temperature, humidity
+    else:
+        return None
 
 
 
@@ -31,6 +60,7 @@ class home(Resource):
 @api.route('/disease-predict')
 class diseasePredict(Resource):
     def get(self):
+        # print(weather_fetch('Kalyan'))
         return {'method':request.method}
     def post(self):
             # check if the post request has the file part
@@ -52,6 +82,30 @@ class diseasePredict(Resource):
                     #"Crop</b>:([a-zA-Z\ ]*)<br/>Disease:([a-zA-Z\ ]*)[<br]*"gm
                 # prediction = disease_dic[prediction].strip().split('<br/>')
                 return {'prediction':data[prediction]}
+
+@api.route('/crop-predict')
+@api.doc(params={'N': 'Nitrogen Value','P':'Phosphorous'})
+class cropPredict(Resource):
+    def post(self):
+        N = int(request.form['nitrogen'])
+        P = int(request.form['phosphorous'])
+        K = int(request.form['pottasium'])
+        ph = float(request.form['ph'])
+        rainfall = float(request.form['rainfall'])
+
+        # state = request.form.get("stt")
+        city = request.form.get("city")
+
+        if weather_fetch(city) != None:
+            temperature, humidity = weather_fetch(city)
+            data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
+            my_prediction = crop_recommendation_model.predict(data)
+            final_prediction = my_prediction[0]
+            return final_prediction
+        else:
+            return {'error':'weather_error'}
+
+
                 
 
         
