@@ -67,8 +67,7 @@ const Hero = ({
                 className="m-0 mb-32 reveal-from-bottom"
                 data-reveal-delay="400"
               >
-                Get fertilizer recommendations and help your crop grow better
-                with us!
+               Plan farming with our tools and increase your crop productivity!
               </p>
               <div className="reveal-from-bottom" data-reveal-delay="600">
                 <ButtonGroup>
@@ -105,7 +104,7 @@ const Hero = ({
             >
               <Image
                 className="has-shadow"
-                src={require("./../../assets/images/video-placeholder.jpg")}
+                src={require("./../../assets/images/farm-image.jpg")}
                 alt="Hero"
                 width={896}
                 height={504}
