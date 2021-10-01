@@ -84,24 +84,27 @@ class diseasePredict(Resource):
                 return {'prediction':data[prediction]}
 
 @api.route('/crop-predict')
-@api.doc(params={'N': 'Nitrogen Value','P':'Phosphorous'})
+
 class cropPredict(Resource):
     def post(self):
-        N = int(request.form['nitrogen'])
-        P = int(request.form['phosphorous'])
-        K = int(request.form['pottasium'])
-        ph = float(request.form['ph'])
-        rainfall = float(request.form['rainfall'])
+        datas = json.loads(request.data)
+        print(datas)
+        N = int(datas['nitrogen'])
+        P = int(datas['phosphorous'])
+        K = int(datas['pottasium'])
+        ph = float(datas['ph'])
+        rainfall = float(datas['rainfall'])
+        city = str(datas['city'])
 
         # state = request.form.get("stt")
-        city = request.form.get("city")
+        
 
         if weather_fetch(city) != None:
             temperature, humidity = weather_fetch(city)
             data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
             my_prediction = crop_recommendation_model.predict(data)
             final_prediction = my_prediction[0]
-            return final_prediction
+            return {'prediction':final_prediction}
         else:
             return {'error':'weather_error'}
 
