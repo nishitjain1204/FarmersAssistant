@@ -106,7 +106,7 @@ class diseasePredict(Resource):
                     filename = secure_filename(file.filename)
                     img = file.read()
                     print('Via flask',type(img))
-                     prediction = predict_image(img)
+                    prediction = predict_image(img)
                     with open('disease_dic.json') as json_file:
                         data = json.load(json_file)
             
@@ -148,5 +148,5 @@ class cropPredict(Resource):
 
 if __name__ == '__main__':
     PORT = int(os.environ.get("PORT", 3000))
-    app.run(host="0.0.0.0", port=PORT, debug=True)
+    app.run(host="192.168.0.105", port=PORT, debug=True)
    
