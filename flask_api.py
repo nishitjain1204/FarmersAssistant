@@ -94,7 +94,8 @@ class diseasePredict(Resource):
                         data = json.load(json_file)
             
                     print(data[prediction])      
-                    return {'prediction':data[prediction]}
+                    return data[prediction]
+                    # return {'prediction':data[prediction]}
                 else:
                     return {'error':'No file part'}
             else:
@@ -148,5 +149,5 @@ class cropPredict(Resource):
 
 if __name__ == '__main__':
     PORT = int(os.environ.get("PORT", 3000))
-    app.run(host="192.168.0.105", port=PORT, debug=True)
+    app.run(host="0.0.0.0", port=PORT, debug=True)
    
