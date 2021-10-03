@@ -13,6 +13,19 @@ import numpy as np
 crop_recommendation_model_path = 'models/RandomForest.pkl'
 crop_recommendation_model = pickle.load(open(crop_recommendation_model_path, 'rb'))
 
+def image_download(url):
+    img_data = requests.get(url).content
+    print(type(img_data))
+    with open('image_name.jpg', 'wb') as handler:
+        handler.write(img_data)
+    file = open('image_name.jpg','rb')
+    return file.read()
+    
+
+    # with open('image_name.jpg', 'wb') as handler:
+    #     handler.write(img_data)
+
+
 def weather_fetch(city_name):
     """
     Fetch and returns the temperature and humidity of a city
@@ -64,24 +77,43 @@ class diseasePredict(Resource):
         return {'method':request.method}
     def post(self):
             # check if the post request has the file part
+            print(request.get_data())
+            # if 'imageUrl' in request.data:
+            #     data = json.loads(request.data)
+            #     print(data)
+            #     img = data['imageUrl']
             if 'file' not in request.files:
-                return {'error':'No file part'}
-            file = request.files['file']
-            if file.filename == '':
-                return {'error':'no file selected'}
-            if file and allowed_file(file.filename):
-                print(file)
-                filename = secure_filename(file.filename)
-                img = file.read()
-                prediction = predict_image(img)
-                with open('disease_dic.json') as json_file:
-                    data = json.load(json_file)
-                # print(data)
-                
+                data = json.loads(request.data)
+                print(data)
+                if 'imageUrl' in data:
+                    img = data['imageUrl']
+                    img = image_download(img)
+                    print('Via android',type(img))
+                    prediction = predict_image(img)
+                    with open('disease_dic.json') as json_file:
+                        data = json.load(json_file)
             
-                    #"Crop</b>:([a-zA-Z\ ]*)<br/>Disease:([a-zA-Z\ ]*)[<br]*"gm
-                # prediction = disease_dic[prediction].strip().split('<br/>')
-                return {'prediction':data[prediction]}
+                    print(data[prediction])      
+                    return {'prediction':data[prediction]}
+                else:
+                    return {'error':'No file part'}
+            else:
+                file = request.files['file']
+                if file.filename == '':
+                    return {'error':'no file selected'}
+                if file and allowed_file(file.filename):
+                    print(file)
+                    filename = secure_filename(file.filename)
+                    img = file.read()
+                    print('Via flask',type(img))
+                     prediction = predict_image(img)
+                    with open('disease_dic.json') as json_file:
+                        data = json.load(json_file)
+            
+                    print(data[prediction])      
+                    return {'prediction':data[prediction]}
+
+            
 
 @api.route('/crop-predict')
 
@@ -116,4 +148,5 @@ class cropPredict(Resource):
 
 if __name__ == '__main__':
     PORT = int(os.environ.get("PORT", 3000))
-    app.run(host="0.0.0.0", port=PORT, debug=True)
+    app.run(host="192.168.0.105", port=PORT, debug=True)
+   
