@@ -147,7 +147,8 @@ class cropPredict(Resource):
 class fertilizerPredict(Resource):
     def post(self):
         datas = json.loads(request.data)
-        crop_name = datas['cropname']
+        print(datas)
+        crop_name = datas['cropname'].lower()
         N = datas['nitrogen']
         P = datas['phosphorous']
         K = datas['pottasium']
@@ -159,9 +160,10 @@ class fertilizerPredict(Resource):
         pr = df[df['Crop'] == crop_name]['P'].iloc[0]
         kr = df[df['Crop'] == crop_name]['K'].iloc[0]
 
-        n = nr - N
-        p = pr - P
-        k = kr - K
+        n = float(nr) - float(N)
+        p =float(pr) - float(P)
+        k = float(kr) - float(K)
+        
         temp = {abs(n): "N", abs(p): "P", abs(k): "K"}
         max_value = temp[max(temp.keys())]
         if max_value == "N":
