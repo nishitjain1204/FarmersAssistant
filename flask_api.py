@@ -5,10 +5,12 @@ from newsscrapper import scraper
 from werkzeug.utils import secure_filename
 from disease_predictions import predict_image
 from utils.disease import disease_dic
+from utils.fertilizer import fertilizer_dic
 import os
 import pickle
 import requests
 import numpy as np
+import pandas as pd
 
 crop_recommendation_model_path = 'models/RandomForest.pkl'
 crop_recommendation_model = pickle.load(open(crop_recommendation_model_path, 'rb'))
@@ -117,7 +119,6 @@ class diseasePredict(Resource):
             
 
 @api.route('/crop-predict')
-
 class cropPredict(Resource):
     def post(self):
         datas = json.loads(request.data)
@@ -140,6 +141,48 @@ class cropPredict(Resource):
             return {'prediction':final_prediction}
         else:
             return {'error':'weather_error'}
+
+
+@api.route('/fertilizer-predict')
+class fertilizerPredict(Resource):
+    def post(self):
+        datas = json.loads(request.data)
+        crop_name = datas['cropname']
+        N = datas['nitrogen']
+        P = datas['phosphorous']
+        K = datas['pottasium']
+        # ph = float(request.form['ph'])
+
+        df = pd.read_csv('Data/fertilizer.csv')
+
+        nr = df[df['Crop'] == crop_name]['N'].iloc[0]
+        pr = df[df['Crop'] == crop_name]['P'].iloc[0]
+        kr = df[df['Crop'] == crop_name]['K'].iloc[0]
+
+        n = nr - N
+        p = pr - P
+        k = kr - K
+        temp = {abs(n): "N", abs(p): "P", abs(k): "K"}
+        max_value = temp[max(temp.keys())]
+        if max_value == "N":
+            if n < 0:
+                key = 'NHigh'
+            else:
+                key = "Nlow"
+        elif max_value == "P":
+            if p < 0:
+                key = 'PHigh'
+            else:
+                key = "Plow"
+        else:
+            if k < 0:
+                key = 'KHigh'
+            else:
+                key = "Klow"
+        
+        return {'fertilizer': str(fertilizer_dic[key]) }
+
+    
 
 
                 
