@@ -79,12 +79,13 @@ class diseasePredict(Resource):
         return {'method':request.method}
     def post(self):
             # check if the post request has the file part
-            print(request.get_data())
+            
             # if 'imageUrl' in request.data:
             #     data = json.loads(request.data)
             #     print(data)
             #     img = data['imageUrl']
             if 'file' not in request.files:
+                print('file not in request')
                 data = json.loads(request.data)
                 print(data)
                 if 'imageUrl' in data:
@@ -102,6 +103,7 @@ class diseasePredict(Resource):
                     return {'error':'No file part'}
             else:
                 file = request.files['file']
+                print(file)
                 if file.filename == '':
                     return {'error':'no file selected'}
                 if file and allowed_file(file.filename):
@@ -113,8 +115,9 @@ class diseasePredict(Resource):
                     with open('disease_dic.json') as json_file:
                         data = json.load(json_file)
             
-                    print(data[prediction])      
-                    return {'prediction':data[prediction]}
+                    ret = data[prediction]     
+                    print(ret)
+                    return ret
 
             
 
