@@ -11,6 +11,8 @@ import pickle
 import requests
 import numpy as np
 import pandas as pd
+from firebase_creds import db
+
 
 crop_recommendation_model_path = 'models/RandomForest.pkl'
 crop_recommendation_model = pickle.load(open(crop_recommendation_model_path, 'rb'))
@@ -78,12 +80,7 @@ class diseasePredict(Resource):
         # print(weather_fetch('Kalyan'))
         return {'method':request.method}
     def post(self):
-            # check if the post request has the file part
             
-            # if 'imageUrl' in request.data:
-            #     data = json.loads(request.data)
-            #     print(data)
-            #     img = data['imageUrl']
             if 'file' not in request.files:
                 print('file not in request')
                 data = json.loads(request.data)
@@ -187,7 +184,28 @@ class fertilizerPredict(Resource):
         
         return {'fertilizer': str(fertilizer_dic[key]) }
 
+
+@api.route('/rpi')
+class rpi(Resource):
+    def post(self):
+        # print(request.data)
+        datas = json.loads(request.data)
+        for key,value in datas.items():
+            db.child(key).set(value)
+        return datas
     
+    def get(self):
+        sensordata=dict(db.child('/').get().val())
+        return sensordata
+
+        
+
+
+
+
+
+        
+
 
 
                 
