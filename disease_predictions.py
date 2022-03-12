@@ -1,15 +1,19 @@
 import numpy as np
 import pandas as pd
 from utils.disease import disease_dic
-
+from lime import lime_image
 import requests
-
+from skimage.segmentation import mark_boundaries
+import matplotlib.pyplot as plt
+from matplotlib import cm
 import pickle
 import io
 import torch
 from torchvision import transforms
 from PIL import Image
 from utils.model import ResNet9
+import torch.nn.functional as F
+import base64
 
 
 disease_classes = ['Apple___Apple_scab',
@@ -57,6 +61,59 @@ disease_model.load_state_dict(torch.load(
     disease_model_path, map_location=torch.device('cpu')))
 disease_model.eval()
 
+
+
+def np_to_pil(ndarray):
+    # im = Image.fromarray(np.uint8(cm.gist_earth(ndarray)*255))
+    im=Image.fromarray(((ndarray)*255).astype(np.uint8)).resize((256, 256)).convert('RGB')
+    rawBytes = io.BytesIO()
+    im.save(rawBytes, "JPEG")
+    rawBytes.seek(0)
+    img_base64 = base64.b64encode(rawBytes.read())
+    return img_base64
+    
+
+
+def get_input_transform():
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.ToTensor(),
+    ])
+    return transform
+    
+
+def get_input_tensors(img):
+    transf = get_input_transform()
+    return transf(img).unsqueeze(0) # unsqueeze converts single image to batch of 1
+
+def get_image(img):
+    # with open(os.path.abspath(path), 'rb') as f:
+    with IImage.open(io.BytesIO(img)) as img:
+        return img.convert('RGB') 
+
+
+def get_pil_transform(): 
+    transf = transforms.Compose([transforms.Resize((256, 256))])   
+    return transf
+
+def get_preprocess_transform(): 
+    transf = transforms.Compose([transforms.ToTensor()])    
+    return transf  
+
+def batch_predict(images):
+    #     model.eval()
+    batch = torch.stack(tuple(preprocess_transform(i) for i in images), dim=0)
+    batch = batch.to(torch.device('cpu'))
+    logits = disease_model(batch)
+    probs = F.softmax(logits , dim=1)
+    return probs.detach().cpu().numpy()  
+
+pill_transf = get_pil_transform()
+preprocess_transform = get_preprocess_transform()
+
+
+        
+
 def predict_image(img, model=disease_model):
     """
     Transforms image to tensor and predicts disease label
@@ -70,6 +127,8 @@ def predict_image(img, model=disease_model):
     image = Image.open(io.BytesIO(img))
     img_t = transform(image)
     img_u = torch.unsqueeze(img_t, 0)
+    
+    
 
     # Get predictions from model
     yb = model(img_u)
@@ -78,3 +137,39 @@ def predict_image(img, model=disease_model):
     prediction = disease_classes[preds[0].item()]
     # Retrieve the class label
     return prediction
+
+
+
+def lime_explaining(img):
+    img = Image.open(img)
+    test_pred = batch_predict([pill_transf(img)])
+    print(test_pred.squeeze().argmax())
+    
+    explainer = lime_image.LimeImageExplainer()
+    explanation = explainer.explain_instance(np.array(pill_transf(img)), 
+                                         batch_predict, # classification function
+#                                          labels = 
+#                                          hide_color=0, 
+                                         random_seed = 0,
+                                         num_samples=100,
+                                        num_features=20
+                                        ) # number of images that will be sent to classificati
+    
+    temp, mask = explanation.get_image_and_mask(explanation.top_labels[0], positive_only=True, num_features=10, hide_rest=False)
+    img_boundry1 = mark_boundaries(temp, mask)
+    plt.imshow(img_boundry1)
+    # plt.savefig('test1.pdf')
+    # explanation.top_labels
+    # print(img_boundry1)
+    print(type(img_boundry1))
+    
+    
+    
+    temp, mask = explanation.get_image_and_mask(explanation.top_labels[0], positive_only=False, num_features=10 , hide_rest=False) 
+    img_boundry2 = mark_boundaries(temp, mask)
+    plt.imshow(img_boundry2)
+    # plt.show()
+    # plt.savefig('test2.pdf')
+    
+    return np_to_pil(img_boundry2)
+    

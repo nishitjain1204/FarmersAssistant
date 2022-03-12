@@ -3,7 +3,7 @@ import json
 from flask_restx import Resource, Api
 from newsscrapper import scraper
 from werkzeug.utils import secure_filename
-from disease_predictions import predict_image
+from disease_predictions import predict_image , lime_explaining
 from utils.disease import disease_dic
 from utils.fertilizer import fertilizer_dic
 import os
@@ -90,6 +90,7 @@ class diseasePredict(Resource):
                     img = image_download(img)
                     print('Via android',type(img))
                     prediction = predict_image(img)
+                    
                     with open('disease_dic.json') as json_file:
                         data = json.load(json_file)
             
@@ -109,12 +110,13 @@ class diseasePredict(Resource):
                     img = file.read()
                     print('Via flask',type(img))
                     prediction = predict_image(img)
+                    explain = lime_explaining(file)
                     with open('disease_dic.json') as json_file:
                         data = json.load(json_file)
             
                     ret = data[prediction]     
-                    print(ret)
-                    return ret
+                    print(explain)
+                    return {'prediction' : ret , 'explanation' : str(explain) }
 
             
 
