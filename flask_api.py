@@ -105,7 +105,7 @@ class diseasePredict(Resource):
                 if file.filename == '':
                     return {'error':'no file selected'}
                 if file and allowed_file(file.filename):
-                    print(file)
+                    print(file.filename)
                     filename = secure_filename(file.filename)
                     img = file.read()
                     print('Via flask',type(img))
@@ -115,7 +115,7 @@ class diseasePredict(Resource):
                         data = json.load(json_file)
             
                     ret = data[prediction]     
-                    print(explain)
+#                     print(explain)
                     return {'prediction' : ret , 'explanation' : str(explain) }
 
             
