@@ -151,7 +151,7 @@ def lime_explaining(img):
 #                                          labels = 
 #                                          hide_color=0, 
                                          random_seed = 0,
-                                         num_samples=10000,
+                                         num_samples=1000,
                                         num_features=20
                                         ) # number of images that will be sent to classificati
     
