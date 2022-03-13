@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import pickle
 import io
+from io import BytesIO
 import torch
 from torchvision import transforms
 from PIL import Image
