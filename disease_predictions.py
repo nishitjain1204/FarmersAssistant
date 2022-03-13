@@ -66,11 +66,11 @@ disease_model.eval()
 def np_to_pil(ndarray):
     # im = Image.fromarray(np.uint8(cm.gist_earth(ndarray)*255))
     im=Image.fromarray(((ndarray)*255).astype(np.uint8)).resize((256, 256)).convert('RGB')
-    rawBytes = io.BytesIO()
-    im.save(rawBytes, "JPEG")
-    rawBytes.seek(0)
-    img_base64 = base64.b64encode(rawBytes.read())
-    return img_base64
+#     rawBytes = io.BytesIO()
+#     im.save(rawBytes, "JPEG")
+#     rawBytes.seek(0)
+#     img_base64 = base64.b64encode(rawBytes.read())
+    return im
     
 
 
